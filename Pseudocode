@@ -1,0 +1,31 @@
+START
+Display "Starting Concurrent Counter Program"
+Create a variable called threadOneFinished and set it to FALSE
+Create Thread 1
+FOR counter from 1 to 20
+    Display the counter value
+    Pause briefly
+END FOR
+
+Display "Thread 1 reached 20"
+
+Set threadOneFinished to TRUE
+
+Notify Thread 2 that Thread 1 is finished
+END Thread 1
+Create Thread 2
+Wait until threadOneFinished is TRUE
+
+Display "Thread 2 starting countdown"
+
+FOR counter from 20 down to 0
+    Display the counter value
+    Pause briefly
+END FOR
+END Thread 2
+Start Thread 1
+Start Thread 2
+Wait for Thread 1 to finish
+Wait for Thread 2 to finish
+Display "Both threads have completed"
+END
