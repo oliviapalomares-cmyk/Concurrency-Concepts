@@ -1,0 +1,76 @@
+package module8;
+
+public class ConcurrencyCounter {
+
+    private static boolean threadOneFinished = false;
+
+    public static void main(String[] args) {
+
+        System.out.println("Starting Concurrent Counter Program...");
+        System.out.println();
+
+        Thread thread1 = new Thread(() -> {
+
+            for (int i = 1; i <= 20; i++) {
+                System.out.println("Thread 1: " + i);
+
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    return;
+                }
+            }
+
+            synchronized (ConcurrencyCounter.class) {
+                threadOneFinished = true;
+                ConcurrencyCounter.class.notify();
+            }
+
+            System.out.println("Thread 1 reached 20.");
+
+        });
+
+        Thread thread2 = new Thread(() -> {
+
+            synchronized (ConcurrencyCounter.class) {
+
+                while (!threadOneFinished) {
+                    try {
+                        ConcurrencyCounter.class.wait();
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                        return;
+                    }
+                }
+            }
+
+            System.out.println();
+            System.out.println("Thread 2 starting countdown:");
+
+            for (int i = 20; i >= 0; i--) {
+                System.out.println("Thread 2: " + i);
+
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    return;
+                }
+            }
+        });
+
+        thread1.start();
+        thread2.start();
+
+        try {
+            thread1.join();
+            thread2.join();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+
+        System.out.println();
+        System.out.println("Both threads have completed.");
+    }
+}
